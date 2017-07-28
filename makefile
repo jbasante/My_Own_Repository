@@ -1,4 +1,4 @@
 all:
 	gcc mafia.c -o mafia
 clean:
-	rm -f mafia
+	rm -f mafia *.*~ *~
