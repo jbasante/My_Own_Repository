@@ -2,39 +2,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-
-/*Determines whether a player is dead or alive*/
-enum Status{
-  alive, 
-  dead
-};
-
-/*Describes a player*/
-typedef struct{
-  char *name;
-  enum Status playerDoA;
-  int vote;
-}Player;
+#include <unistd.h>
+#include "mafia.h"
 
 struct node{
-  Player NewPlayer;
+  Player * NewPlayer;
   struct node *next;
 };
 
 struct node *head = NULL;
 struct node *tail = NULL;
 
-/*Function definitions*/
-void AddToGame(Player player2Add);
-void RemoveFromGame();
-bool noPlayer();
-Player * createPlayer(char *namOfPlayer);
-
 int main(){
 
   int numOfPlayers;
   char PorR;
-
+  char playerFirstName[64];
+  Player * tryPlayer;
+  
   printf("\n*************************MAFIA*****************************\n"
 	 "Mafia is a game of many players. As many players can play\n"
 	 "the game as possible. At least six(6) people must play the game.\n"
@@ -46,23 +31,31 @@ int main(){
   while(1){
     while(1){
       printf("How many players will be playing the game: ");
-      if ((scanf("%d", &numOfPlayers) == 1) && (numOfPlayers > 5))
+      /*Break from loop if the entered value is a number and greater than 5. Else, ask the user to enter a new value*/
+      if ((scanf("%d", &numOfPlayers) == 1) && (numOfPlayers > 5)){
+	printf("You entered %d.\n",  numOfPlayers);
 	break;
-      while(getchar() != '\n');
+      }else
+	printf("Incorrect input. Please try again...\n");
+      ridNewline();
     }
     while(1){
-      printf("You entered %d.\n"
-	     "Press p to continue or r to enter a different number of players: ", numOfPlayers);
-      while(getchar() != '\n');
+      /*Press a button to either continue or put in a different number of players*/
+      printf("Press p to continue or r to enter a different number of players: ");
+      ridNewline();
       PorR = getchar();
+      ridNewline();
       
       if (PorR == 'p'){
-	printf("Please enter your name as the first player of the game: ");
-	break;
+	printf("Please enter your first name as the first player of the game: ");
+	fgets(playerFirstName, sizeof(playerFirstName), stdin);
+	tryPlayer = createPlayer(playerFirstName);
+	printf("The name of the player is %s. He is currenly %d. His vote number is %d\n", tryPlayer->name, tryPlayer->playerDoA, tryPlayer->vote);
+	AddToGame(tryPlayer);
+	free(tryPlayer);
 	/*Play game here*/
       }
       else if(PorR == 'r'){
-	printf("Please wait ...\n");
 	break;
       }
       else{
@@ -70,21 +63,13 @@ int main(){
       }
     }
   }
-  /*  
-  Player * tryPlayer;
-  char tryname[64] = "Joseph";
-  tryPlayer = createPlayer(tryname);
-  printf("The name of the player is %s. He is currenly %d. His vote number is %d\n", tryPlayer->name, tryPlayer->playerDoA, tryPlayer->vote);
-  free(tryPlayer);
-  */
   return 0;
 }
 
-/*
-void AddToGame(struct Player player2Add){
+void AddToGame(Player * player2Add){
   struct node *newPlayer = (struct node *)malloc(sizeof(struct node));
-  newPLayer->NewPlayer = player2Add;
-  nwPlayer->next = NULL;
+  newPlayer->NewPlayer = player2Add;
+  newPlayer->next = NULL;
 
   if(noPlayer()){
     head = newPlayer;
@@ -95,7 +80,7 @@ void AddToGame(struct Player player2Add){
     tail = tail->next;
   }
 }
-*/
+
 
 void RemoveFromGame(){
 }
@@ -113,4 +98,14 @@ Player * createPlayer(char *nameOfPlayer){
   newPlayer->vote = 0;
 
   return newPlayer;
+}
+
+void ridNewline(){
+  while(getchar() != '\n');
+}
+
+void delay(int delTime){
+  int x = 0;
+  while(x < delTime)
+    x++;
 }
